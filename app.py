@@ -5,12 +5,13 @@ import uuid
 
 app = Flask(__name__)
 
-# Load trained model
-model = YOLO("runs/detect/train7/weights/best.pt")
+# Load trained YOLO model
+model = YOLO("./runs/detect/train7/weights/best.pt")
 
 UPLOAD_FOLDER = "uploads"
 RESULT_FOLDER = "static"
 
+# Ensure folders exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RESULT_FOLDER, exist_ok=True)
 
@@ -26,10 +27,10 @@ def index():
             upload_path = os.path.join(UPLOAD_FOLDER, file.filename)
             file.save(upload_path)
 
-            # Run detection
+            # Run YOLO detection
             results = model(upload_path, conf=0.25)
 
-            # Save result with unique name
+            # Save result image
             result_name = f"result_{uuid.uuid4().hex}.jpg"
             result_path = os.path.join(RESULT_FOLDER, result_name)
 
@@ -41,4 +42,5 @@ def index():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
