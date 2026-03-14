@@ -1,19 +1,26 @@
 from flask import Flask, render_template, request
 from ultralytics import YOLO
+from werkzeug.utils import secure_filename
 import os
 import uuid
 
 app = Flask(__name__)
 
-# Load YOLO model
-model = YOLO("./runs/detect/train7/weights/best.pt")
-
 UPLOAD_FOLDER = "uploads"
 RESULT_FOLDER = "static"
 
-# Create folders if they don't exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RESULT_FOLDER, exist_ok=True)
+
+# Lazy load model (loads only when first detection happens)
+model = None
+
+def get_model():
+    global model
+    if model is None:
+        print("Loading YOLO model...")
+        model = YOLO("runs/detect/train7/weights/best.pt")
+    return model
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -22,7 +29,6 @@ def index():
 
     if request.method == "POST":
 
-        # Check if image exists in request
         if "image" not in request.files:
             return render_template("index.html", result_img=None)
 
@@ -31,14 +37,16 @@ def index():
         if file.filename == "":
             return render_template("index.html", result_img=None)
 
-        # Save uploaded image
-        upload_path = os.path.join(UPLOAD_FOLDER, file.filename)
+        filename = secure_filename(file.filename)
+
+        upload_path = os.path.join(UPLOAD_FOLDER, filename)
         file.save(upload_path)
 
-        # Run YOLO detection
+        # Load model only when needed
+        model = get_model()
+
         results = model(upload_path, conf=0.25)
 
-        # Save detection result with unique name
         result_name = f"result_{uuid.uuid4().hex}.jpg"
         result_path = os.path.join(RESULT_FOLDER, result_name)
 
