@@ -1,5 +1,5 @@
+flask
 ultralytics
 opencv-python
-numpy
-matplotlib
-pandas
+torch
+torchvision

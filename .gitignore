@@ -1,6 +1,6 @@
 venv/
 __pycache__/
 *.pyc
-*.pt
-runs/
-dataset/
+runs/detect/train*
+dataset/train*
+dataset/valid*

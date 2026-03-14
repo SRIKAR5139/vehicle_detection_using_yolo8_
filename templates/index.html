@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Vehicle Detection YOLOv8</title>
+
+<style>
+body{
+    font-family: Arial;
+    text-align: center;
+}
+
+.container{
+    margin-top:40px;
+}
+
+img{
+    margin-top:20px;
+    width:900px;
+    border-radius:10px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Vehicle Detection using YOLOv8</h1>
+
+<form method="POST" enctype="multipart/form-data">
+<input type="file" name="image" required>
+<button type="submit">Detect</button>
+</form>
+
+{% if result_img %}
+<h2>Detection Result</h2>
+
+<img src="{{ url_for('static', filename=result_img) }}">
+
+{% endif %}
+
+</div>
+
+</body>
+</html>

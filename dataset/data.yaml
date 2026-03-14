@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 13
+names: ['Bicycle', 'Bus', 'Car', 'E-Bike', 'Flatbed-Truck', 'Jeep', 'Jeepney', 'Motorcycle', 'Pickup-Truck', 'Tricycle', 'Truck', 'Tuk-tuk', 'Van']
+
+roboflow:
+  workspace: vision-drive
+  project: vehicle-detection-wl1on
+  version: 10
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/vision-drive/vehicle-detection-wl1on/dataset/10
