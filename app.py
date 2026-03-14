@@ -5,38 +5,46 @@ import uuid
 
 app = Flask(__name__)
 
-# Load trained YOLO model
+# Load YOLO model
 model = YOLO("./runs/detect/train7/weights/best.pt")
 
 UPLOAD_FOLDER = "uploads"
 RESULT_FOLDER = "static"
 
-# Ensure folders exist
+# Create folders if they don't exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RESULT_FOLDER, exist_ok=True)
+
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     result_img = None
 
     if request.method == "POST":
+
+        # Check if image exists in request
+        if "image" not in request.files:
+            return render_template("index.html", result_img=None)
+
         file = request.files["image"]
 
-        if file:
-            # Save uploaded image
-            upload_path = os.path.join(UPLOAD_FOLDER, file.filename)
-            file.save(upload_path)
+        if file.filename == "":
+            return render_template("index.html", result_img=None)
 
-            # Run YOLO detection
-            results = model(upload_path, conf=0.25)
+        # Save uploaded image
+        upload_path = os.path.join(UPLOAD_FOLDER, file.filename)
+        file.save(upload_path)
 
-            # Save result image
-            result_name = f"result_{uuid.uuid4().hex}.jpg"
-            result_path = os.path.join(RESULT_FOLDER, result_name)
+        # Run YOLO detection
+        results = model(upload_path, conf=0.25)
 
-            results[0].save(filename=result_path)
+        # Save detection result with unique name
+        result_name = f"result_{uuid.uuid4().hex}.jpg"
+        result_path = os.path.join(RESULT_FOLDER, result_name)
 
-            result_img = result_name
+        results[0].save(filename=result_path)
+
+        result_img = result_name
 
     return render_template("index.html", result_img=result_img)
 
